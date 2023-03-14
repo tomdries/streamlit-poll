@@ -6,7 +6,9 @@ import gspread
 sheet_name = 'Form-app'
 secret_file = 'client_secret.json'
 
-gc = gspread.service_account(filename=secret_file)
+# if streamlit app tested locally, use the following line
+
+gc = gspread.service_account()#filename=secret_file)
 
 # Define main function to run the app
 def main():

@@ -1,49 +1,10 @@
 import streamlit as st
 import gspread
 import streamlit.components.v1 as components
-import random
 import pandas as pd
 from datetime import datetime
 
-
-
-
 def get_youtube_html(video_id, t_start, t_end, height=360, width=640):
-    html = """<div id="ytplayer"></div>
-        <script>
-        // Load the IFrame Player API code asynchronously.
-        var tag = document.createElement('script');
-        tag.src = "https://www.youtube.com/player_api";
-        var firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
-        // Replace the 'ytplayer' element with an <iframe> and
-        // YouTube player after the API code downloads.
-        var player;
-        function onYouTubePlayerAPIReady() {
-            player = new YT.Player('ytplayer', {
-                height: '%s',
-                width: '%s',
-                videoId: '%s',
-                rel: '0',
-    
-                playerVars: {
-                    'controls': 0,
-                    'disablekb': 0  ,
-                    'start': '%s',
-                    'end': '%s',
-                    'rel': 0,
-                    'modestbranding': 1,
-                    'showinfo': 0,
-                    'autoplay': 0,
-                    'title': ''
-                }
-            });
-        }
-        </script>""" % (height, width, video_id, t_start, t_end)
-    return html
-
-def get_youtube_html2(video_id, t_start, t_end, height=360, width=640):
     html = f"""
         <style>
             #playerWrap {{
@@ -157,7 +118,7 @@ user_name = st.text_input("Name")
 # page contents
 st.title("Tagging Examiner Comments")
 
-components.html(get_youtube_html2(id, t_start, t_end, video_height, video_width), width=video_width, height=video_height)
+components.html(get_youtube_html(id, t_start, t_end, video_height, video_width), width=video_width, height=video_height)
 
 if st.button("Not relevant, skip"):
     # if user_name is empty, ask user to enter name

@@ -145,8 +145,7 @@ ix = st.session_state.next_chunk_ix
 id = st.session_state.df.loc[ix, 'video_id']
 t_start = int(st.session_state.start_times[ix])
 t_end = int(st.session_state.end_times[ix])
-if t_start - t_end == 0:
-    t_end = t_start + 3
+t_end = t_end+3
 video_height = 360
 video_width = 640
 
@@ -157,7 +156,21 @@ user_name = st.text_input("Name")
 
 # page contents
 st.title("Tagging Examiner Comments")
+
 components.html(get_youtube_html2(id, t_start, t_end, video_height, video_width), width=video_width, height=video_height)
+
+if st.button("Not relevant, skip"):
+    # if user_name is empty, ask user to enter name
+    if not user_name:
+        st.error("Please enter your name.")
+    else:
+        # create timestamp in str format
+        timestamp = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        submit_vote_to_sheet("Form-app", [st.session_state.next_chunk_ix, user_name, timestamp, 'not relevant'])
+        
+        st.session_state.next_chunk_ix += 1
+        st.experimental_rerun()
+
 
 genre = st.radio(
     "The described situation happens...",
@@ -184,9 +197,7 @@ if st.button("Next"):
     else:
         # create timestamp in str format
         timestamp = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-
-        submit_vote_to_sheet("Form-app", [st.session_state.next_chunk_ix, user_name, criticality, sentiment, happiness, comment, timestamp])
-        
+        submit_vote_to_sheet("Form-app", [st.session_state.next_chunk_ix, user_name, timestamp, criticality, sentiment, happiness, comment])
         st.session_state.next_chunk_ix += 1
         st.experimental_rerun()
 

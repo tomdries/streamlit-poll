@@ -3,6 +3,7 @@ import gspread
 import streamlit.components.v1 as components
 import random
 import pandas as pd
+from datetime import datetime
 
 
 
@@ -152,11 +153,28 @@ video_width = 640
 
 user_name = st.text_input("Name")
 
+
+
 # page contents
 st.title("Tagging Examiner Comments")
 components.html(get_youtube_html2(id, t_start, t_end, video_height, video_width), width=video_width, height=video_height)
-criticality = st.slider("Criticality", 0, 10, 0)
-semtiment = st.slider("Overall sentiment", 0, 10, 0)
+
+genre = st.radio(
+    "The described situation happens...",
+    ("before the fragment.", "during the fragment.", "after the fragment.", "unclear (default)"), index=3)
+
+criticality = st.slider("How critical is the described situation?", 0, 10, 0)
+# checkboxes: The situation that's described is "taking place during the fragment", "taking place before the fragment", "taking place after the fragment"
+
+
+
+
+sentiment = st.slider("Overall sentiment", 0, 10, 0)
+
+happiness = st.select_slider(
+    'How happy is the examiner?',
+    options=['very unhappy', 'unhappy', 'neutral', 'happy', 'very happy'], value='neutral')
+
 comment = st.text_area("Comment")
 
 if st.button("Next"):
@@ -164,12 +182,15 @@ if st.button("Next"):
     if not user_name:
         st.error("Please enter your name.")
     else:
-        submit_vote_to_sheet("Form-app", [st.session_state.next_chunk_ix, user_name, criticality])
+        # create timestamp in str format
+        timestamp = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
+        submit_vote_to_sheet("Form-app", [st.session_state.next_chunk_ix, user_name, criticality, sentiment, happiness, comment, timestamp])
         
         st.session_state.next_chunk_ix += 1
         st.experimental_rerun()
 
-with st.expander("Debug info"):
+with st.expander("More info about the video"):
     st.write("GPT-enhanced transcript:")
     st.write(st.session_state.df.loc[ix, 'response_2'])
     st.write("Chunk index", ix)

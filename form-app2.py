@@ -4,6 +4,9 @@ import streamlit.components.v1 as components
 import random
 import pandas as pd
 
+
+
+
 def get_youtube_html(video_id, t_start, t_end, height=360, width=640):
     html = """<div id="ytplayer"></div>
         <script>
@@ -40,57 +43,73 @@ def get_youtube_html(video_id, t_start, t_end, height=360, width=640):
     return html
 
 def get_youtube_html2(video_id, t_start, t_end, height=360, width=640):
-    html = """<div id="ytplayer"></div>
+    html = f"""
+        <style>
+            #playerWrap {{
+                display: inline-block;
+                position: relative;
+            }}
+            #playerWrap.shown::after {{
+                content:"";
+                position: absolute;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                right: 0;
+                cursor: pointer;
+                background-color: black;
+                background-repeat: no-repeat;
+                background-position: center; 
+                background-size: 64px 64px;
+                background-image: url(data:image/svg+xml;utf8;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4IiB2aWV3Qm94PSIwIDAgNTEwIDUxMCI+PHBhdGggZD0iTTI1NSAxMDJWMEwxMjcuNSAxMjcuNSAyNTUgMjU1VjE1M2M4NC4xNSAwIDE1MyA2OC44NSAxNTMgMTUzcy02OC44NSAxNTMtMTUzIDE1My0xNTMtNjguODUtMTUzLTE1M0g1MWMwIDExMi4yIDkxLjggMjA0IDIwNCAyMDRzMjA0LTkxLjggMjA0LTIwNC05MS44LTIwNC0yMDQtMjA0eiIgZmlsbD0iI0ZGRiIvPjwvc3ZnPg==);
+            }}
+        </style>
+        <div id="playerWrap">
+            <div id="ytplayer"></div>
+        </div>
         <script>
-        // Load the IFrame Player API code asynchronously.
-        var tag = document.createElement('script');
-        tag.src = "https://www.youtube.com/player_api";
-        var firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+            var tag = document.createElement('script');
+            tag.src = "https://www.youtube.com/player_api";
+            var firstScriptTag = document.getElementsByTagName('script')[0];
+            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
-        // Replace the 'ytplayer' element with an <iframe> and
-        // YouTube player after the API code downloads.
-        var player;
-        function onYouTubePlayerAPIReady() {
-            player = new YT.Player('ytplayer', {
-                height: '%s',
-                width: '%s',
-                videoId: '%s',
-                rel: '0',
-    
-                playerVars: {
-                    'controls': 0,
-                    'disablekb': 0,
-                    'start': '%s',
-                    'end': '%s',
-                    'rel': 0,
-                    'modestbranding': 1,
-                    'showinfo': 0,
-                    'autoplay': 0,
-                    'title': ''
-                },
-                
-                events: {
-                    'onStateChange': function(event) {
-                        if (event.data == YT.PlayerState.ENDED) {
-                            player.seekTo(%s);
-                            player.playVideo();
-                        }
-                    }
-                }
-            });
-        }
-        
-        function replayVideo() {
-            player.seekTo(%s);
-            player.playVideo();
-        }
+            var player;
+            function onYouTubePlayerAPIReady() {{
+                player = new YT.Player('ytplayer', {{
+                    height: '{height}',
+                    width: '{width}',
+                    videoId: '{video_id}',
+                    playerVars: {{
+                        'controls': 0,
+                        'disablekb': 0,
+                        'start': '{t_start}',
+                        'end': '{t_end}',
+                        'rel': 0,
+                        'modestbranding': 1,
+                        'showinfo': 0,
+                        'autoplay': 0,
+                        'title': ''
+                    }},
+                    events: {{
+                        'onStateChange': onPlayerStateChange
+                    }}
+                }});
+            }}
+
+            function onPlayerStateChange(event) {{
+                if (event.data == YT.PlayerState.ENDED) {{
+                    document.getElementById("playerWrap").classList.add("shown");
+                }}
+            }}
+
+            document.getElementById("playerWrap").addEventListener("click", function() {{
+                player.seekTo({t_start});
+                player.playVideo();
+                document.getElementById("playerWrap").classList.remove("shown");
+            }});
         </script>
-        <button onclick="replayVideo()" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 4rem; border: none; background-color: transparent;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="display: block; margin: auto;"><path d="M5 3L19 12L5 21V3Z"/></svg>
-        </button>""" % (height, width, video_id, t_start, t_end, t_start, t_start)
+    """
     return html
-
 
 def submit_vote_to_sheet(sheet_name, row):
     # if streamlit app tested locally, use the following line

@@ -162,9 +162,13 @@ if st.button("Next"):
         st.session_state.next_chunk_ix += 1
         st.experimental_rerun()
 
-with st.expander("More info about the video"):
-    st.write("GPT-enhanced transcript:")
+with st.expander("Reveal ChatGPT's verdict"):
+    st.markdown("#### GPT-enhanced transcript")
     st.write(st.session_state.df.loc[ix, 'response_2'])
+    st.markdown("#### ChatGPT's criticality rating")
+    st.write(st.session_state.df.loc[ix, 'response'])
+
+    st.markdown("#### Other")
     st.write("Chunk index", ix)
     st.write("Video ID", id)
     st.write("Start time", t_start)
@@ -172,6 +176,7 @@ with st.expander("More info about the video"):
     st.write("Duration", t_end - t_start)
     st.write("Original transcript:")
     st.write(st.session_state.df.loc[ix, 'text'])
+
     
     
 
